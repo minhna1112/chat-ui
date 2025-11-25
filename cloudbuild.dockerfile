@@ -17,7 +17,7 @@ ENV HOME=/home/user \
 WORKDIR /app
 
 # add a .env.local if the user doesn't bind a volume to it
-RUN touch /app/.env.local
+# RUN touch /app/.env.local
 
 USER root
 RUN apt-get update
