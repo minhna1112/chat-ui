@@ -218,6 +218,48 @@ const resolveTaskModel = (modelList: ProcessedModel[]) => {
 	return modelList[0];
 };
 
+const reorderModelsWithDefault = (modelList: ProcessedModel[]): ProcessedModel[] => {
+	if (modelList.length === 0) {
+		return modelList;
+	}
+
+	const defaultModel = config.DEFAULT_MODEL;
+	if (!defaultModel) {
+		return modelList;
+	}
+
+	const defaultModelIndex = modelList.findIndex(
+		(m) => m.name === defaultModel || m.id === defaultModel
+	);
+
+	if (defaultModelIndex === -1) {
+		logger.warn(
+			{ DEFAULT_MODEL: defaultModel },
+			"[models] DEFAULT_MODEL not found in available models, using first model as default"
+		);
+		return modelList;
+	}
+
+	if (defaultModelIndex === 0) {
+		return modelList;
+	}
+
+	// Move the default model to the front
+	const defaultModelItem = modelList[defaultModelIndex];
+	const reordered = [
+		defaultModelItem,
+		...modelList.slice(0, defaultModelIndex),
+		...modelList.slice(defaultModelIndex + 1),
+	];
+
+	logger.info(
+		{ DEFAULT_MODEL: defaultModel, modelId: defaultModelItem.id },
+		"[models] Reordered models to set default model"
+	);
+
+	return reordered;
+};
+
 const signatureForModel = (model: ProcessedModel) =>
 	JSON.stringify({
 		description: model.description,
@@ -251,7 +293,8 @@ const applyModelState = (newModels: ProcessedModel[], startedAt: number): Models
 	const refreshedAt = new Date();
 	const durationMs = Date.now() - startedAt;
 
-	models = newModels;
+	// Reorder models to put the default model first if DEFAULT_MODEL is configured
+	models = reorderModelsWithDefault(newModels);
 	defaultModel = models[0];
 	taskModel = resolveTaskModel(models);
 	validModelIdSchema = createValidModelIdSchema(models);
