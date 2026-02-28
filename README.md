@@ -126,6 +126,17 @@ PUBLIC_APP_DATA_SHARING=
 
 This build does not use the `MODELS` env var or GGUF discovery. Configure models via `OPENAI_BASE_URL` only; Chat UI will fetch `${OPENAI_BASE_URL}/models` and populate the list automatically. Authorization uses `OPENAI_API_KEY` (preferred). `HF_TOKEN` remains a legacy alias.
 
+**Setting a Default Model:**
+
+You can specify which model should be selected by default using the `DEFAULT_MODEL` environment variable. Set it to the model ID or name from your OpenAI-compatible endpoint's model list. If not set, the first model returned by the API will be used as the default.
+
+Example:
+```env
+DEFAULT_MODEL=gpt-oss-20b
+```
+
+This is particularly useful when you want a specific model (like `gpt-oss-20b` from https://huggingface.co/openai/gpt-oss-20b) to be the default instead of the first one returned by the API.
+
 ### LLM Router (Optional)
 
 Chat UI can perform client-side routing [katanemo/Arch-Router-1.5B](https://huggingface.co/katanemo/Arch-Router-1.5B) as the routing model without running a separate router service. The UI exposes a virtual model alias called "Omni" (configurable) that, when selected, chooses the best route/model for each message.
